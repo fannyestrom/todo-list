@@ -2,9 +2,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const cors = require('cors');
+const connection = require('./lib/conn');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const { log } = require('console');
 
 var app = express();
 
@@ -13,8 +16,60 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.get('/todo', (req, res) => {
+
+    connection.connect((err) => {
+        if (err) console.log('err', err);
+
+        let query = 'SELECT * FROM todo';
+
+        connection.query(query, (err, data) => {
+            if (err) console.log('err', err);
+
+            console.log('todos', data);
+            res.json(data);
+        })
+    })
+})
+
+app.post('/todo', (req, res) => {
+
+    let todo = req.body.todo;
+    let userId = req.body.userId;
+
+    connection.connect((err) => {
+        if (err) console.log('err', err);
+
+        let query = 'INSERT into todo (todo, userId) VALUES (?, ?)';
+        let values = [todo, userId];
+
+        connection.query(query, values, (err, data) => {
+            if (err) console.log('err', err);
+
+            console.log('todos', data);
+            res.json({message: 'Todo sparad!'});
+        })
+    })
+})
+
+app.delete('/todo/:todoId', (req, res) => {
+    let todoId = req.params.todoId;
+
+    connection.connect((err) => {
+        if (err) console.log('err', err);
+
+        let query = 'DELETE FROM todo WHERE id = ?';
+        let values = [todoId];
+
+        connection.query(query, values, (err, data) => {
+            if (err) console.log('err', err);
+
+            console.log('todos', data);
+            res.json({message: 'Todo deleted!'});
+        })
+    })
+})
 
 module.exports = app;
