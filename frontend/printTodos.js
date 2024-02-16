@@ -14,7 +14,9 @@ export default function printTodos() {
             let li = document.createElement('li')
             li.innerText = todo.todo;
 
-            li.addEventListener
+            li.addEventListener('click', () => {
+                deleteTodo(todo.id)
+            })
 
             todoList.appendChild(li);
         })

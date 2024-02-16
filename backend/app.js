@@ -23,7 +23,7 @@ app.get('/todo', (req, res) => {
     connection.connect((err) => {
         if (err) console.log('err', err);
 
-        let query = 'SELECT * FROM todo';
+        let query = 'SELECT * FROM todo WHERE done=0';
 
         connection.query(query, (err, data) => {
             if (err) console.log('err', err);
@@ -49,7 +49,7 @@ app.post('/todo', (req, res) => {
             if (err) console.log('err', err);
 
             console.log('todos', data);
-            res.json({message: 'Todo sparad!'});
+            res.json({message: 'Todo added!'});
         })
     })
 })
@@ -60,7 +60,8 @@ app.delete('/todo/:todoId', (req, res) => {
     connection.connect((err) => {
         if (err) console.log('err', err);
 
-        let query = 'DELETE FROM todo WHERE id = ?';
+        let query = 'UPDATE todo SET done=1 WHERE id = ?';
+        // let query = 'DELETE FROM todo WHERE id = ?';
         let values = [todoId];
 
         connection.query(query, values, (err, data) => {
